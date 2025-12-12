@@ -3,9 +3,8 @@
 FoodShare is a full-stack MERN application designed to fight food insecurity in Nairobi County. It connects restaurants, hotels, and individuals with surplus food to the communities that need it most, bridging the gap between abundance and scarcity.
 
 ## Live Demo
-- **Live Application:** [Insert Vercel Link Here]
-- **Backend API:** [Insert Render Link Here]
-- **Video Demonstration:** [Insert Video Link Here]
+- **Live Application:** https://foodshare-app-nine.vercel.app/
+- **Backend API:** https://foodshare-app-e99t.onrender.com
 
 ## Tech Stack
 
