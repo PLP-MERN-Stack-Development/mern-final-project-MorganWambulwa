@@ -151,7 +151,6 @@ const Dashboard = () => {
       
       <div className="container mx-auto px-4 pt-24">
         
-        {/* --- HEADER SECTION --- */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-10 animate-in fade-in slide-in-from-top-4 duration-500">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -160,14 +159,13 @@ const Dashboard = () => {
               </span>
             </div>
             <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
-              Hello, {user?.name?.split(' ')[0]} 👋
+              Hello, {user?.name?.split(' ')[0]}
             </h1>
             <p className="text-slate-500 mt-2 text-lg">
               {user?.role === 'donor' ? "Manage your contributions and track impact." : "Explore available food and make requests."}
             </p>
           </div>
 
-          {/* Quick Stats Row */}
           <div className="flex gap-4 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0">
             <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm min-w-[140px] flex items-center gap-3">
               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Package className="h-5 w-5" /></div>
@@ -193,7 +191,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* --- ERROR BANNER --- */}
         {error && (
           <div className="mb-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3">
             <AlertCircle className="h-5 w-5" />
@@ -201,10 +198,8 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* --- MAIN CONTENT TABS --- */}
         <Tabs defaultValue={getDefaultTab()} className="space-y-8">
           
-          {/* Custom Tab List */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm sticky top-20 z-30">
             <TabsList className="bg-slate-100/50 p-1 rounded-xl h-auto flex-wrap justify-start w-full md:w-auto">
               {user?.role !== 'driver' && <TabsTrigger value="overview" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">Overview</TabsTrigger>}
@@ -222,7 +217,6 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* CREATE FORM MODAL (Replaces inline form for cleaner UI) */}
           {showCreate && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in">
               <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl p-6 md:p-8 animate-in zoom-in-95">
@@ -237,7 +231,6 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* --- CONTENT AREA --- */}
           
           <TabsContent value="overview" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex gap-3">
@@ -332,7 +325,6 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
 
-        {/* DETAILS MODAL */}
         {selectedDonation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
