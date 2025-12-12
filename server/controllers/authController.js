@@ -7,6 +7,12 @@ const generateToken = (id) => {
   });
 };
 
+const getBaseUrl = (req) => {
+  const protocol = req.protocol;
+  const host = req.get('host');
+  return `${protocol}://${host}`;
+};
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, phone, organization } = req.body;
@@ -100,7 +106,8 @@ export const updateProfile = async (req, res) => {
       }
 
       if (req.file) {
-        user.avatar = `http://localhost:5000/uploads/${req.file.filename}`;
+        const baseUrl = getBaseUrl(req);
+        user.avatar = `${baseUrl}/uploads/${req.file.filename}`;
       }
 
       const updatedUser = await user.save();

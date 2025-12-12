@@ -28,7 +28,6 @@ router.route('/:id')
   .put(protect, authorize('donor', 'admin'), upload.single('image'), updateDonation)
   .delete(protect, authorize('donor', 'admin'), deleteDonation);
 
-
 router.get('/deliveries', protect, authorize('driver'), getMyDeliveries);
 router.patch('/deliveries/:id', protect, authorize('driver'), updateDeliveryStatus);
 
