@@ -19,7 +19,6 @@ const Navbar = () => {
 
   const scrollToSection = (sectionId) => {
     setIsMobileMenuOpen(false);
-
     if (location.pathname !== "/") {
       navigate("/");
       setTimeout(() => {
@@ -44,7 +43,7 @@ const Navbar = () => {
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 z-50 shadow-sm transition-all duration-300">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         
-
+        {/* LOGO */}
         <button 
           onClick={() => scrollToSection("home")} 
           className="flex items-center gap-2 text-2xl font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
@@ -52,13 +51,15 @@ const Navbar = () => {
           <HeartHandshake className="h-8 w-8" />
           <span>FoodShare</span>
         </button>
-
+        
+        {/* DESKTOP MENU - Added "About Us" */}
         <div className="hidden md:flex items-center gap-8 font-medium text-gray-600">
           <button onClick={() => scrollToSection("home")} className="hover:text-emerald-600 transition-colors">Home</button>
-          <button onClick={() => scrollToSection("how-it-works")} className="hover:text-emerald-600 transition-colors">How It Works</button>
+          <button onClick={() => scrollToSection("how-it-works")} className="hover:text-emerald-600 transition-colors">About Us</button> {/* Renamed/Linked */}
           <button onClick={() => scrollToSection("impact")} className="hover:text-emerald-600 transition-colors">Impact</button>
         </div>
 
+        {/* AUTH BUTTONS */}
         <div className="hidden md:flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
@@ -98,7 +99,7 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link to="/auth">
-                <Button className="bg-gradient-hero shadow-md hover:shadow-lg transition-all">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
                   Get Started
                 </Button>
               </Link>
@@ -106,6 +107,7 @@ const Navbar = () => {
           )}
         </div>
 
+        {/* MOBILE TOGGLE */}
         <div className="md:hidden">
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
@@ -116,19 +118,19 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-xl absolute w-full left-0 animate-in slide-in-from-top-5 duration-200">
           <div className="p-4 space-y-4">
-            
             <div className="space-y-2 border-b border-gray-100 pb-4">
               <button onClick={() => scrollToSection("home")} className="block w-full text-left py-2 px-3 rounded-md hover:bg-gray-50 font-medium text-gray-700">
                 Home
               </button>
               <button onClick={() => scrollToSection("how-it-works")} className="block w-full text-left py-2 px-3 rounded-md hover:bg-gray-50 font-medium text-gray-700">
-                How It Works
+                About Us
               </button>
               <button onClick={() => scrollToSection("impact")} className="block w-full text-left py-2 px-3 rounded-md hover:bg-gray-50 font-medium text-gray-700">
-                Our Impact
+                Impact
               </button>
             </div>
             
@@ -171,7 +173,7 @@ const Navbar = () => {
                     </Button>
                   </Link>
                   <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-hero justify-center shadow-md">
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white justify-center shadow-md">
                       Get Started
                     </Button>
                   </Link>

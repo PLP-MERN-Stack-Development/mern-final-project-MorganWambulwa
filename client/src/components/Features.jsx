@@ -1,65 +1,53 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { HeartHandshake, Truck, Utensils } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
-    icon: Utensils,
-    title: "Donate Surplus Food",
-    description: "Restaurants and individuals can easily post available food for donation through our platform. Snap a photo, add details, and post.",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-100"
+    title: "HOW IT WORKS",
+    image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80", // Fresh Veggies
+    link: "/how-it-works",
+    description: "See how we connect surplus to scarcity."
   },
   {
-    icon: Truck,
-    title: "Fast Delivery",
-    description: "Integrated with local delivery services to ensure quick and efficient food distribution before it spoils.",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100"
+    title: "HUNGER IN KENYA",
+    image: "https://images.unsplash.com/photo-1596560548464-f010549b84d7?auto=format&fit=crop&q=80", // Community/People
+    link: "/about",
+    description: "Understand the impact of food insecurity."
   },
   {
-    icon: HeartHandshake,
-    title: "Request & Receive",
-    description: "Families and food banks can browse live maps and request food donations based on their immediate needs.",
-    color: "text-rose-600",
-    bgColor: "bg-rose-100"
+    title: "WAYS TO GIVE",
+    image: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&q=80", // Healthy Food
+    link: "/auth",
+    description: "Donate food, time, or funds."
   },
 ];
 
 const Features = () => {
   return (
-    <section id="how-it-works" className="py-24 bg-gray-50">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16 max-w-2xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-            How FoodShare Works
-          </h2>
-          <p className="text-xl text-gray-600">
-            A simple, efficient platform connecting surplus food with those in need in three simple steps.
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <Card 
-                key={index}
-                className="border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-white"
-              >
-                <CardContent className="pt-10 pb-8 px-8 text-center h-full flex flex-col items-center">
-                  <div className={`w-20 h-20 mb-6 rounded-2xl ${feature.bgColor} flex items-center justify-center p-4 shadow-inner`}>
-                    <Icon className={`w-10 h-10 ${feature.color}`} />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="grid md:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <Link to={feature.link} key={index} className="group relative h-80 overflow-hidden shadow-lg cursor-pointer">
+              {/* Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                style={{ backgroundImage: `url(${feature.image})` }}
+              />
+              
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300" />
+              
+              {/* Text Box (Bordered like reference) */}
+              <div className="absolute inset-4 border-2 border-white/80 flex flex-col items-center justify-center p-4 text-center">
+                <h3 className="text-3xl md:text-4xl font-black text-white uppercase leading-none drop-shadow-lg mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-white/0 group-hover:text-white/90 transition-all duration-300 font-medium translate-y-4 group-hover:translate-y-0">
+                  {feature.description}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

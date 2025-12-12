@@ -37,7 +37,7 @@ const Impact = () => {
             Our Growing Impact
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Together, we're making a real difference in fighting hunger across Kenya
+            Together, we're making a real difference in fighting hunger across Kenya.
           </p>
         </div>
         

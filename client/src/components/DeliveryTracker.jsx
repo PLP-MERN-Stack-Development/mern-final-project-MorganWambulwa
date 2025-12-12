@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Package, CheckCircle, Truck, User } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
 
 const DeliveryTracker = () => {
   const [deliveries, setDeliveries] = useState([]);
@@ -17,8 +16,11 @@ const DeliveryTracker = () => {
       const { data } = await api.get("/donations/deliveries");
       setDeliveries(data);
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to load deliveries");
+      console.error("Fetch Deliveries Error:", error);
+      // Only show toast if it's a real error, not just empty
+      if (error.response && error.response.status !== 404) {
+        toast.error("Failed to load deliveries");
+      }
     } finally {
       setLoading(false);
     }
@@ -26,18 +28,28 @@ const DeliveryTracker = () => {
 
   useEffect(() => {
     fetchDeliveries();
-    
-    const interval = setInterval(fetchDeliveries, 30000);
+    const interval = setInterval(fetchDeliveries, 30000); // Auto-refresh every 30s
     return () => clearInterval(interval);
   }, []);
 
   const updateStatus = async (id, status) => {
+    // Optimistic UI update (feels faster)
+    const originalDeliveries = [...deliveries];
+    setDeliveries(deliveries.map(d => d._id === id ? { ...d, status } : d));
+
     try {
-      await api.patch(`/donations/deliveries/${id}`, { status });
+      // Send the status string directly in the body
+      await api.patch(`/donations/deliveries/${id}`, { status: status });
+      
       toast.success(`Status updated to ${status.replace('_', ' ')}`);
-      fetchDeliveries();
+      fetchDeliveries(); // Refresh to ensure sync
     } catch (error) {
-      toast.error("Failed to update status");
+      console.error("Update Status Error:", error);
+      // Revert optimistic update on failure
+      setDeliveries(originalDeliveries);
+      
+      const msg = error.response?.data?.message || "Failed to update status";
+      toast.error(msg);
     }
   };
 
@@ -87,7 +99,7 @@ const DeliveryTracker = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold text-gray-900 text-base flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-400" /> {job.donor?.name}
+                    <User className="h-4 w-4 text-gray-400" /> {job.donor?.name || "Unknown Donor"}
                   </p>
                   <div className="flex items-start gap-2 text-gray-600">
                     <MapPin className="h-4 w-4 mt-0.5 text-gray-400" /> 
@@ -107,7 +119,7 @@ const DeliveryTracker = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold text-gray-900 text-base flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-400" /> {job.receiver?.name}
+                    <User className="h-4 w-4 text-gray-400" /> {job.receiver?.name || "Unknown Receiver"}
                   </p>
                   <div className="flex items-start gap-2 text-gray-600">
                     <MapPin className="h-4 w-4 mt-0.5 text-gray-400" /> 

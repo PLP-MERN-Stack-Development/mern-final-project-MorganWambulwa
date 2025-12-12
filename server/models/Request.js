@@ -17,32 +17,30 @@ const requestSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    message: {
-      type: String,
-      maxlength: 500,
-    },
-    status: {
-      type: String,
-      enum: ['Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled'],
-      default: 'Pending',
-    },
     deliveryPerson: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       default: null,
+    },
+    message: {
+      type: String,
+      default: "I would like to request this donation.",
+    },
+    status: {
+      type: String,
+      enum: ['Pending', 'Approved', 'Rejected', 'In Transit', 'Completed'],
+      default: 'Pending',
     },
     respondedAt: {
       type: Date,
     },
     completedAt: {
       type: Date,
-    },
+    }
   },
   {
     timestamps: true,
   }
 );
-
-requestSchema.index({ donation: 1, receiver: 1 }, { unique: true });
 
 export default mongoose.model('Request', requestSchema);
