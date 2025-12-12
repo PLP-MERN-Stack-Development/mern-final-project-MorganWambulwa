@@ -114,8 +114,8 @@ Screenshots
 
 ## 👥 Group Members
 
-**1. Morgan Wambulwa** (Lead / Backend / Testing)
+**1. Morgan Wambulwa** (Backend / Testing / Frontend)
 - **GitHub:** [@MorganWambulwa](https://github.com/MorganWambulwa)
 
-**2. Lydia Wasilwa** (Frontend / UI / [Their Role])
+**2. Lydia Wasilwa** (Frontend / Testing / Backend)
 - **GitHub:** [@LydiaWasilwa](https://github.com/Lydia-Wasilwa)
