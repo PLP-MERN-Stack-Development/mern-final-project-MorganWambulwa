@@ -5,6 +5,8 @@ FoodShare is a full-stack MERN application designed to fight food insecurity in 
 ## Live Demo
 - **Live Application:** https://foodshare-app-nine.vercel.app/
 - **Backend API:** https://foodshare-app-e99t.onrender.com
+- **Video Demo:** <video controls src="Recording 2025-12-12 165025.mp4" title="Video Demo"></video>
+
 
 ## Tech Stack
 
