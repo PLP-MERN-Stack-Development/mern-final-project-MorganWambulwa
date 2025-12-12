@@ -1,22 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
+
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Points to your Node/Express backend
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: BASE_URL,
+  withCredentials: true,
 });
-
-// Automatically add token to requests if it exists
-api.interceptors.request.use(
-  (config) => {
-    const user = JSON.parse(localStorage.getItem('foodshare_user'));
-    if (user && user.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export default api;
