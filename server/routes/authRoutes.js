@@ -11,12 +11,21 @@ import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
+
 router.post('/register', registerUser);
-router.post('/login', loginUser);
+
+router.post('/login', (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  loginUser(req, res, next);
+});
 
 router.get('/me', protect, getMe);
 router.get('/drivers', protect, getDrivers);
-
 
 router.put('/profile', protect, upload.single('avatar'), updateProfile);
 
