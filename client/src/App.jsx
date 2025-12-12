@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Privacy from "./pages/Privacy"; 
 import Terms from "./pages/Terms"; 
 import Cookies from "./pages/Cookies"; 
+import About from "./pages/About"; // 1. Import About Page
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -22,6 +23,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/about" element={<About />} /> {/* 2. Add Route */}
           <Route path="/auth" element={<Auth />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />

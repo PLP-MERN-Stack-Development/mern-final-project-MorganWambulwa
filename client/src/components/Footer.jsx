@@ -20,7 +20,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gray-900 text-gray-100 pt-20 pb-8">
+    <footer className="bg-gray-900 text-gray-100 pt-10 pb-6">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
@@ -73,7 +73,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-gray-800 pt-8 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} FoodShare Kenya. All rights reserved. Built for Zero Hunger.</p>
+          <p>&copy; {new Date().getFullYear()} FoodShare Kenya. All rights reserved.</p>
         </div>
       </div>
     </footer>

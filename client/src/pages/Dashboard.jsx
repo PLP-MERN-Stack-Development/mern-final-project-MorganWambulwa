@@ -11,23 +11,29 @@ import DeliveryTracker from "@/components/DeliveryTracker";
 import DonationsMap from "@/components/DonationsMap"; 
 import { useAuth } from "../context/AuthContext";
 import { 
-  PlusCircle, 
+  Plus, 
   Search, 
-  Filter, 
+  SlidersHorizontal, 
   X, 
   Package, 
   AlertCircle, 
   ArrowLeft,
-  Calendar,
+  LayoutGrid,
+  Map as MapIcon,
+  List,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
   ImageOff,
-  Trash2,
-  MapPin
+  MapPin,
+  Calendar,
+  Trash2
 } from "lucide-react";
 import api from "@/api/axios";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 const FALLBACK_DONATIONS = [
   { _id: "demo-1", title: "Demo Vegetables", foodType: "Vegetables", quantity: "15kg", pickupLocation: "Nairobi", status: "Available", donor: { name: "Demo User" } }
@@ -39,6 +45,7 @@ const Dashboard = () => {
   
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState("grid"); 
   
   const [donations, setDonations] = useState([]);
   const [myRequests, setMyRequests] = useState([]); 
@@ -56,7 +63,6 @@ const Dashboard = () => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    
     try {
       if (user?.role === 'driver') {
         setLoading(false);
@@ -76,7 +82,7 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Dashboard Fetch Error:", err);
       if (!err.response && user?.role === 'receiver') {
-         setError("Could not connect. Showing demo data.");
+         setError("Connection failed. Showing demo data.");
          setDonations(FALLBACK_DONATIONS);
       } else {
         if (user?.role === 'donor') setDonations([]);
@@ -88,7 +94,6 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, [user]);
-
 
   const handleRequestDonation = async (id) => {
     if (id.startsWith("demo-")) return toast.info("Demo item cannot be requested.");
@@ -103,24 +108,24 @@ const Dashboard = () => {
   };
 
   const handleCancelRequest = async (requestId) => {
-    if (!confirm("Are you sure you want to cancel this request?")) return;
+    if (!confirm("Cancel this request?")) return;
     try {
       await api.delete(`/donations/requests/${requestId}/cancel`);
-      toast.success("Request cancelled successfully");
+      toast.success("Request cancelled");
       fetchData(); 
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to cancel");
+      toast.error("Failed to cancel");
     }
   };
 
   const handleDeleteDonation = async (id) => {
-    if (!confirm("Delete this donation? This cannot be undone.")) return;
+    if (!confirm("Delete this donation?")) return;
     try {
       await api.delete(`/donations/${id}`);
-      toast.success("Donation deleted successfully");
+      toast.success("Donation deleted");
       fetchData(); 
     } catch (error) {
-      toast.error("Failed to delete donation");
+      toast.error("Failed to delete");
     }
   };
 
@@ -135,143 +140,182 @@ const Dashboard = () => {
     d.pickupLocation?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Dynamic Stats Calculation
+  const activeCount = donations.filter(d => d.status === 'Available').length;
+  const completedCount = donations.filter(d => d.status === 'Delivered' || d.status === 'Completed').length;
+  const totalCount = donations.length;
+
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-slate-50 font-sans pb-20">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-8 pt-24">
+      <div className="container mx-auto px-4 pt-24">
         
-        {/* Improved Header Banner */}
-        <div className="relative overflow-hidden bg-emerald-900 rounded-3xl p-8 mb-8 text-white shadow-xl">
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2 opacity-80">
-                <Badge variant="outline" className="border-white/30 text-white capitalize">
-                  {user?.role} Account
-                </Badge>
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name}</h1>
-              <p className="text-emerald-100 mt-1">
-                {user?.role === 'donor' ? 'Thank you for making a difference today.' : 
-                 user?.role === 'driver' ? 'Ready to deliver some happiness?' : 
-                 'Find fresh food near you.'}
-              </p>
+        {/* --- HEADER SECTION --- */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-10 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold uppercase tracking-wider border border-orange-200">
+                {user?.role} Dashboard
+              </span>
             </div>
+            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+              Hello, {user?.name?.split(' ')[0]} 👋
+            </h1>
+            <p className="text-slate-500 mt-2 text-lg">
+              {user?.role === 'donor' ? "Manage your contributions and track impact." : "Explore available food and make requests."}
+            </p>
+          </div>
+
+          {/* Quick Stats Row */}
+          <div className="flex gap-4 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0">
+            <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm min-w-[140px] flex items-center gap-3">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Package className="h-5 w-5" /></div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">{totalCount}</p>
+                <p className="text-xs text-slate-500 font-medium uppercase">Total Items</p>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm min-w-[140px] flex items-center gap-3">
+              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><CheckCircle2 className="h-5 w-5" /></div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">{activeCount}</p>
+                <p className="text-xs text-slate-500 font-medium uppercase">Active</p>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm min-w-[140px] flex items-center gap-3">
+              <div className="p-2 bg-orange-50 text-orange-600 rounded-lg"><TrendingUp className="h-5 w-5" /></div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900">{completedCount}</p>
+                <p className="text-xs text-slate-500 font-medium uppercase">Completed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* --- ERROR BANNER --- */}
+        {error && (
+          <div className="mb-8 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3">
+            <AlertCircle className="h-5 w-5" />
+            <span className="font-medium">{error}</span>
+          </div>
+        )}
+
+        {/* --- MAIN CONTENT TABS --- */}
+        <Tabs defaultValue={getDefaultTab()} className="space-y-8">
+          
+          {/* Custom Tab List */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm sticky top-20 z-30">
+            <TabsList className="bg-slate-100/50 p-1 rounded-xl h-auto flex-wrap justify-start w-full md:w-auto">
+              {user?.role !== 'driver' && <TabsTrigger value="overview" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">Overview</TabsTrigger>}
+              {user?.role === 'donor' && <TabsTrigger value="donations" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">My Donations</TabsTrigger>}
+              {user?.role === 'donor' && <TabsTrigger value="requests" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">Requests</TabsTrigger>}
+              {user?.role === 'receiver' && <TabsTrigger value="my-requests" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">My Requests</TabsTrigger>}
+              {user?.role === 'driver' && <TabsTrigger value="deliveries" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">Deliveries</TabsTrigger>}
+              <TabsTrigger value="map" className="rounded-lg px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all">Live Map</TabsTrigger>
+            </TabsList>
+
             {user?.role === 'donor' && (
-              <Button onClick={() => setShowCreate(!showCreate)} className="bg-white text-emerald-900 hover:bg-emerald-50 border-none shadow-lg h-12 px-6 font-semibold">
-                {showCreate ? <><X className="mr-2 h-4 w-4" /> Close Form</> : <><PlusCircle className="mr-2 h-4 w-4" /> Post Donation</>}
+              <Button onClick={() => setShowCreate(true)} className="w-full md:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-lg shadow-slate-200 px-6">
+                <Plus className="h-4 w-4 mr-2" /> Post Donation
               </Button>
             )}
           </div>
-          {/* Background decoration */}
-          <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-        </div>
 
-        {/* Create Form */}
-        {showCreate && user?.role === 'donor' && (
-          <div className="mb-10 bg-white rounded-2xl shadow-xl border border-gray-100 p-6 animate-in slide-in-from-top-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 pb-4 border-b border-gray-100">
-              <Package className="h-5 w-5 text-emerald-600" /> Create New Donation
-            </h2>
-            <CreateDonationForm onSuccess={() => { setShowCreate(false); fetchData(); }} />
-          </div>
-        )}
-
-        {/* Error Alert */}
-        {error && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
-
-        {/* Tabs - Improved Styling */}
-        <Tabs defaultValue={getDefaultTab()} className="space-y-8">
-          <div className="flex justify-center md:justify-start overflow-x-auto pb-2">
-            <TabsList className="bg-white border p-1.5 shadow-sm rounded-full h-auto inline-flex gap-1">
-              {user?.role !== 'driver' && <TabsTrigger value="overview" className="rounded-full px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">Overview</TabsTrigger>}
-              {user?.role === 'donor' && <TabsTrigger value="donations" className="rounded-full px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">My Donations</TabsTrigger>}
-              {user?.role === 'donor' && <TabsTrigger value="requests" className="rounded-full px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">Incoming Requests</TabsTrigger>}
-              {user?.role === 'receiver' && <TabsTrigger value="my-requests" className="rounded-full px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">My Requests</TabsTrigger>}
-              {user?.role === 'driver' && <TabsTrigger value="deliveries" className="rounded-full px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">Deliveries</TabsTrigger>}
-              <TabsTrigger value="map" className="rounded-full px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">Live Map</TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* Tab 1: Overview */}
-          <TabsContent value="overview" className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex gap-4">
-              <div className="relative flex-1 max-w-lg">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input placeholder="Search food, location..." className="pl-10 h-11 bg-white border-gray-200" value={search} onChange={e => setSearch(e.target.value)} />
+          {/* CREATE FORM MODAL (Replaces inline form for cleaner UI) */}
+          {showCreate && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in">
+              <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl p-6 md:p-8 animate-in zoom-in-95">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900">Post New Donation</h2>
+                  <Button variant="ghost" size="icon" onClick={() => setShowCreate(false)} className="rounded-full hover:bg-slate-100">
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                <CreateDonationForm onSuccess={() => { setShowCreate(false); fetchData(); }} />
               </div>
-              <Button variant="outline" className="h-11 bg-white"><Filter className="h-4 w-4 mr-2" /> Filters</Button>
+            </div>
+          )}
+
+          {/* --- CONTENT AREA --- */}
+          
+          <TabsContent value="overview" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Input 
+                  placeholder="Search food types, locations..." 
+                  className="pl-10 h-11 bg-white border-slate-200 rounded-xl focus:ring-emerald-500"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+              <Button variant="outline" className="h-11 rounded-xl border-slate-200 bg-white">
+                <SlidersHorizontal className="h-4 w-4 mr-2" /> Filter
+              </Button>
             </div>
 
-            {loading ? <div className="text-center py-20 text-gray-400">Loading...</div> : (
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1,2,3].map(i => <div key={i} className="h-80 bg-slate-100 rounded-3xl animate-pulse"></div>)}
+              </div>
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredDonations.length > 0 ? (
                   filteredDonations.map(d => (
                     <DonationCard key={d._id} donation={d} userType={user.role} onRequest={handleRequestDonation} onView={handleViewDetails} />
                   ))
                 ) : (
-                  <div className="col-span-full py-20 text-center bg-white border border-gray-100 rounded-2xl shadow-sm">
-                    <p className="text-gray-500 text-lg">No donations found.</p>
+                  <div className="col-span-full py-20 text-center bg-white border border-dashed border-slate-200 rounded-3xl">
+                    <p className="text-slate-500">No donations found matching your search.</p>
                   </div>
                 )}
               </div>
             )}
           </TabsContent>
 
-          {/* Tab 2: My Donations */}
-          <TabsContent value="donations" className="space-y-6 animate-in fade-in duration-500">
+          <TabsContent value="donations" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredDonations.length > 0 ? (
-                filteredDonations.map(d => (
-                  <DonationCard key={d._id} donation={d} userType={user.role} onView={handleViewDetails} onDelete={handleDeleteDonation} />
-                ))
-              ) : (
-                <div className="col-span-full py-20 text-center bg-white border border-gray-100 rounded-2xl shadow-sm">
-                  <p className="text-gray-500 mb-4">You haven't posted any donations yet.</p>
-                  <Button variant="link" onClick={() => setShowCreate(true)} className="text-emerald-600 font-semibold">Post your first donation</Button>
-                </div>
-              )}
+              {filteredDonations.map(d => (
+                <DonationCard key={d._id} donation={d} userType={user.role} onView={handleViewDetails} onDelete={handleDeleteDonation} />
+              ))}
             </div>
           </TabsContent>
 
-          {/* Tab 3: My Requests */}
-          <TabsContent value="my-requests" className="space-y-4 animate-in fade-in duration-500">
+          <TabsContent value="my-requests" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
             {myRequests.length === 0 ? (
-              <div className="py-20 text-center bg-white border border-gray-100 rounded-2xl shadow-sm text-gray-500">
-                You haven't made any requests yet.
+              <div className="py-20 text-center text-slate-500 bg-white rounded-3xl border border-dashed border-slate-200">
+                You haven't requested anything yet.
               </div>
             ) : (
               <div className="grid gap-4">
                 {myRequests.map((req) => (
-                  <Card key={req._id} className="border-none shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-                    <div className={`h-1.5 w-full ${req.status === 'Pending' ? 'bg-amber-400' : req.status === 'Approved' ? 'bg-emerald-500' : 'bg-gray-300'}`}></div>
-                    <CardContent className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-900">{req.donation?.title || "Unknown Item"}</h3>
-                        <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
-                          <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md"><Calendar className="h-3 w-3" /> {format(new Date(req.createdAt), "MMM d, yyyy")}</span>
-                          <Badge className={`${req.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'} hover:bg-opacity-80`}>
-                            {req.status}
-                          </Badge>
+                  <Card key={req._id} className="border border-slate-100 shadow-sm hover:shadow-md transition-all rounded-2xl overflow-hidden group">
+                    <CardContent className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 bg-slate-50 text-slate-500 rounded-xl group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
+                          <Package className="h-6 w-6" />
                         </div>
-                        <p className="text-xs text-gray-400 mt-2">Donor: {req.donor?.name || "Unknown"}</p>
+                        <div>
+                          <h3 className="font-bold text-lg text-slate-900">{req.donation?.title || "Unknown Item"}</h3>
+                          <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+                            <span className="flex items-center gap-1"><Calendar className="h-4 w-4" /> {format(new Date(req.createdAt), "MMM d")}</span>
+                            <span>•</span>
+                            <span>Donor: {req.donor?.name || "Unknown"}</span>
+                          </div>
+                        </div>
                       </div>
                       
-                      {(req.status === 'Pending' || req.status === 'Approved') && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                          onClick={() => handleCancelRequest(req._id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" /> Cancel
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                        <Badge className={`px-3 py-1 ${req.status === 'Pending' ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} border-none`}>
+                          {req.status}
+                        </Badge>
+                        {(req.status === 'Pending' || req.status === 'Approved') && (
+                          <Button variant="ghost" size="sm" onClick={() => handleCancelRequest(req._id)} className="text-red-500 hover:bg-red-50 hover:text-red-600">
+                            <Trash2 className="h-4 w-4 mr-2" /> Cancel
+                          </Button>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -282,57 +326,52 @@ const Dashboard = () => {
           <TabsContent value="requests"><RequestManagement /></TabsContent>
           <TabsContent value="deliveries"><DeliveryTracker /></TabsContent>
           <TabsContent value="map">
-            <div className="h-[600px] w-full rounded-2xl overflow-hidden border border-gray-200 shadow-xl relative bg-gray-100">
+            <div className="h-[700px] w-full rounded-3xl overflow-hidden border border-slate-200 shadow-xl relative bg-slate-100">
                <DonationsMap />
             </div>
           </TabsContent>
         </Tabs>
 
+        {/* DETAILS MODAL */}
         {selectedDonation && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-              <div className="relative h-72 bg-gray-100 group">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="relative h-72 bg-slate-100 group">
                 {selectedDonation.image ? (
                   <img src={selectedDonation.image} alt={selectedDonation.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                     <ImageOff className="h-16 w-16 mb-3 opacity-20" />
                     <span>No Preview</span>
                   </div>
                 )}
-                
-                {selectedDonation.image && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />}
-                
-                <button onClick={() => setSelectedDonation(null)} className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white rounded-full transition-colors"><X className="h-5 w-5" /></button>
-                
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+                <button onClick={() => setSelectedDonation(null)} className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-full transition-colors"><X className="h-5 w-5" /></button>
                 <div className="absolute bottom-0 left-0 w-full p-8 text-white">
-                   <Badge className="bg-emerald-500 mb-2 border-none">{selectedDonation.foodType}</Badge>
-                   <h2 className={`text-3xl font-bold ${!selectedDonation.image ? 'text-gray-900' : 'text-white'}`}>{selectedDonation.title}</h2>
+                   <Badge className="bg-emerald-500 mb-2 border-none px-3 py-1">{selectedDonation.foodType}</Badge>
+                   <h2 className="text-3xl font-bold leading-tight">{selectedDonation.title}</h2>
                 </div>
               </div>
-              
               <div className="p-8 space-y-8">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-gray-50 p-5 rounded-2xl space-y-2">
-                    <h3 className="font-bold flex gap-2 text-gray-900"><Package className="h-5 w-5 text-emerald-600" /> Details</h3>
-                    <p className="text-sm text-gray-600 pl-7">Quantity: <span className="font-semibold text-gray-900">{selectedDonation.quantity}</span></p>
-                    <p className="text-sm text-gray-600 pl-7">Type: <span className="font-semibold text-gray-900">{selectedDonation.foodType}</span></p>
+                  <div className="bg-slate-50 p-5 rounded-2xl">
+                    <h3 className="font-bold flex items-center gap-2 text-slate-900 mb-2"><Package className="h-5 w-5 text-emerald-600" /> Donation Details</h3>
+                    <p className="text-sm text-slate-600 pl-7">Quantity: <span className="font-semibold text-slate-900">{selectedDonation.quantity}</span></p>
+                    <p className="text-sm text-slate-600 pl-7">Expiry: <span className="font-semibold text-slate-900">{selectedDonation.bestBefore ? format(new Date(selectedDonation.bestBefore), "MMM d") : "N/A"}</span></p>
                   </div>
-                  <div className="bg-emerald-50 p-5 rounded-2xl space-y-2 border border-emerald-100">
-                    <h3 className="font-bold flex gap-2 text-emerald-900"><MapPin className="h-5 w-5 text-emerald-600" /> Location</h3>
-                    <p className="text-sm text-emerald-800 pl-7">{selectedDonation.pickupLocation}</p>
+                  <div className="bg-orange-50/50 p-5 rounded-2xl">
+                    <h3 className="font-bold flex items-center gap-2 text-slate-900 mb-2"><MapPin className="h-5 w-5 text-orange-500" /> Pickup Location</h3>
+                    <p className="text-sm text-slate-600 pl-7 font-medium">{selectedDonation.pickupLocation}</p>
                   </div>
                 </div>
-                
-                <div className="space-y-3">
-                   <h3 className="font-bold text-gray-900">Description</h3>
-                   <p className="text-gray-600 leading-relaxed">{selectedDonation.description}</p>
+                <div>
+                   <h3 className="font-bold text-slate-900 mb-2">Description</h3>
+                   <p className="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl">{selectedDonation.description || "No additional details provided."}</p>
                 </div>
-
-                <div className="flex gap-4 pt-4 border-t border-gray-100">
-                  <Button variant="outline" className="flex-1 h-12 rounded-xl" onClick={() => setSelectedDonation(null)}>Close</Button>
+                <div className="flex gap-4 pt-4 border-t border-slate-100">
+                  <Button variant="outline" className="flex-1 h-12 rounded-xl border-slate-300 font-semibold" onClick={() => setSelectedDonation(null)}>Close</Button>
                   {user?.role === 'receiver' && selectedDonation.status === 'Available' && (
-                    <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white h-12 rounded-xl shadow-lg shadow-emerald-200" onClick={() => { handleRequestDonation(selectedDonation._id); setSelectedDonation(null); }}>Request Donation</Button>
+                    <Button className="flex-1 bg-slate-900 hover:bg-slate-800 text-white h-12 rounded-xl shadow-lg font-bold" onClick={() => { handleRequestDonation(selectedDonation._id); setSelectedDonation(null); }}>Request Donation</Button>
                   )}
                 </div>
               </div>
