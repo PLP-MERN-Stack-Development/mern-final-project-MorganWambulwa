@@ -107,15 +107,25 @@ DELETE	/api/donations/:id	Remove a donation listing
 
 Screenshots
 
-[![Home](Screenshots/Screenshot 2025-12-12 215350.png)](Screenshots/Screenshot 2025-12-12 215350.png)
+<a href="Screenshots/Screenshot 2025-12-12 215350.png">
+  <img src="Screenshots/Screenshot 2025-12-12 215350.png" alt="Home" width="500">
+</a>
 
-[![Profile View](Screenshots/Screenshot 2025-12-12 215403.png)](Screenshots/Screenshot 2025-12-12 215403.png)
+<a href="Screenshots/Screenshot 2025-12-12 215403.png">
+  <img src="Screenshots/Screenshot 2025-12-12 215403.png" alt="Profile View" width="500">
+</a>
 
-[![Dashboard](Screenshots/Screenshot 2025-12-12 215403-1.png)](Screenshots/Screenshot 2025-12-12 215403-1.png)
+<a href="Screenshots/Screenshot 2025-12-12 215403-1.png">
+  <img src="Screenshots/Screenshot 2025-12-12 215403-1.png" alt="Dashboard" width="500">
+</a>
 
-[![My Requests](Screenshots/Screenshot 2025-12-12 215448.png)](Screenshots/Screenshot 2025-12-12 215448.png)
+<a href="Screenshots/Screenshot 2025-12-12 215448.png">
+  <img src="Screenshots/Screenshot 2025-12-12 215448.png" alt="My Requests" width="500">
+</a>
 
-[![Map View](Screenshots/Screenshot 2025-12-12 215457.png)](Screenshots/Screenshot 2025-12-12 215457.png)
+<a href="Screenshots/Screenshot 2025-12-12 215457.png">
+  <img src="Screenshots/Screenshot 2025-12-12 215457.png" alt="Map View" width="500">
+</a>
 
 
 ## 👥 Group Members
