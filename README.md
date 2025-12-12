@@ -6,7 +6,9 @@ FoodShare is a comprehensive full-stack MERN application designed to fight food 
 
 - **Frontend Application:** [View Live App](https://foodshare-app-nine.vercel.app/)
 - **Backend API:** [View API Health](https://foodshare-app-e99t.onrender.com)
-- **Video Demonstration:** <video controls src="Recording 2025-12-12 165025.mp4" title="Foodshare Video Demo"></video>
+
+### Video Demo
+[![Watch the video](Screenshots/Screenshot 2025-12-12 215350.png)](https://drive.google.com/file/d/1oVxVS4iIfLVn5LYeMC-kwmpSTPklOOgQ/view?usp=sharing)
 
 > Note: The backend is hosted on a free tier service (Render). Please allow up to 30 seconds for the initial request to wake up the server.
 
